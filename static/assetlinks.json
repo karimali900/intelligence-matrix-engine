@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.railway.up.intelligence_matrix_engine_production.twa",
+        "sha256_cert_fingerprints": ["04:81:4E:A9:52:CE:A1:DF:93:E1:A0:37:4A:73:C6:78:93:FA:70:6A:9F:E4:5F:BF:B9:C7:D4:A7:F9:65:6B:3E"]
+      }
+    }]

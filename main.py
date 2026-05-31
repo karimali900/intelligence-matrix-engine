@@ -20,6 +20,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from supabase import create_client, Client
 from fastapi.staticfiles import StaticFiles
+from flask import send_from_directory
 logger = logging.getLogger("matrix")
 logging.basicConfig(
     level=logging.INFO,
@@ -217,6 +218,16 @@ def detect_sentiment(text: str) -> str:
     return "Neutral ⚪"
 
 
+
+# ... your other routes ...
+
+@app.route('/.well-known/assetlinks.json')
+def serve_assetlinks():
+    return send_from_directory(
+        os.path.join(app.root_path, 'static'),
+        'assetlinks.json',
+        mimetype='application/json'
+    )
 async def fetch_rss(client: httpx.AsyncClient, url: str, source_tag: str) -> list[dict]:
     async with SCRAPE_SEMAPHORE:
         for attempt in range(2):
@@ -608,4 +619,4 @@ if __name__ == "__main__":
         webbrowser.open("http://127.0.0.1:8001")
 
     threading.Thread(target=open_browser, daemon=True).start()
-    uvicorn.run("main:app", host="0.0.0.0", port=8002, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=True)

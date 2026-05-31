@@ -1,4 +1,5 @@
 {
+    "id": "/?source=pwa",
     "name": "Intelligence Matrix Engine",
     "short_name": "Matrix",
     "description": "Cross-channel intelligence trend monitoring dashboard",
@@ -19,5 +20,13 @@
             "type": "image/png",
             "purpose": "any maskable"
         }
-   ]
+    ],
+    "screenshots": [
+        {
+            "src": "/static/dashboard-screenshot.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide"
+        }
+    ]
 }

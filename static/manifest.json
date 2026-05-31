@@ -24,7 +24,7 @@
     "screenshots": [
         {
             "src": "/static/dashboard-screenshot.png",
-            "sizes": "1280x720",
+            "sizes": "967x675",
             "type": "image/png",
             "form_factor": "wide"
         }

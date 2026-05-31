@@ -1,0 +1,9 @@
+environ.get%28%22SERPAPI_KEY%22%2C+%22YOUR_SERPAPI_KEY_HERE%22%29 "HTTP/1.1 401 Unauthorized"
+19:32:10 [WARNING] matrix: Google Trends error: Client error '401 Unauthorized' for url 'https://serpapi.com/search.json?engine=google_trends_trending_now&geo=EG&api_key=os.environ.get%28%22SERPAPI_KEY%22%2C+%22YOUR_SERPAPI_KEY_HERE%22%29'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+19:32:10 [INFO] httpx: HTTP Request: GET https://t.me/AlArabiya_EGY "HTTP/1.1 200 OK"
+19:32:10 [INFO] matrix: Fetched Telegram posts from AlArabiya_EGY
+19:32:10 [INFO] httpx: HTTP Request: GET https://t.me/s/skynewsarabia "HTTP/1.1 302 Found"
+19:32:10 [INFO] httpx: HTTP Request: GET https://t.me/skynewsarabia "HTTP/1.1 200 OK"
+19:32:10 [INFO] matrix: Fetched Telegram posts from skynewsarabia
+19:32:10 [INFO] httpx: HTTP Request: GET https:/

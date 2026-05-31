@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en" id="html-root" dir="ltr">
+<head>
+<link rel="icon" type="image/x-icon" href="//home/karim/Documents/trends/templates/index.html/avicon.ico">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Intelligence Matrix | Dashboard Control Room</title>
+<link rel="manifest" href="/static/manifest.json">
+<meta name="theme-color" content="#38bdf8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body { background: radial-gradient(circle at top, #1e293b, #020617); color: #e2e8f0; font-family: monospace; }
+.glass { background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; backdrop-filter: blur(10px); }
+.badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+.badge-x { background: #000000; border: 1px solid #374151; }
+.badge-facebook { background: #1877F2; }
+.badge-telegram { background: #26A5E4; }
+.badge-news { background: #059669; }
+.badge-google { background: #EA4335; }
+.badge-youtube { background: #FF0000; }
+.tab-btn.active { border-color: #38bdf8; color: #38bdf8; background: rgba(56, 189, 248, 0.1); }
+</style>
+</head>
+<body class="p-4 md:p-8 h-[100dvh] flex flex-col overflow-hidden">
+ <div style="position: absolute; top: 20px; left: 55%; transform: translateX(-50%); display: flex; align-items: center; gap: 15px; z-index: 1000; background: rgba(0, 0, 0, 0.85); padding: 10px 25px; border-radius: 50px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+
+    <img src="/static/karim1.png" alt="karim Arafa" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #555; background-color: #111;">
+
+    <div style="display: flex; flex-direction: column; justify-content: center; text-align: left;">
+        <span style="color: #fff; font-family: monospace; font-size: 14px; font-weight: bold; letter-spacing: 1px;">Karim Arafa</span>
+        <span style="color: #aaa; font-family: Arial, sans-serif; font-size: 13px;">كريم عرفة</span>
+    </div>
+
+</div>
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 shrink-0 gap-4">
+    <div class="w-full md:w-auto">
+        <h1 id="main-title" class="text-xl md:text-3xl font-bold text-sky-400 flex items-center gap-2 md:gap-3 leading-tight">
+            ⚡ CROSS-CHANNEL PLATFORM
+            <span id="connection-status" class="flex h-3 w-3 relative shrink-0">
+                <span class="animate-ping absolute inline-flex h-3 w-3 rounded-full bg-red-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+            </span>
+        </h1>
+        <p class="text-slate-400 text-xs md:text-sm mt-1" id="status-text">Synchronizing platform ...</p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2 md:gap-3 w-full md:w-auto">
+        <button onclick="toggleLanguage()" id="lang-toggle-btn" class="flex-1 md:flex-none bg-slate-800 hover:bg-slate-700 border border-slate-600 px-4 py-2 md:py-3 rounded font-bold text-xs tracking-wider text-sky-400 transition shadow-md">
+            عربي
+        </button>
+        <button onclick="triggerManualCycle()" id="refresh-btn" class="flex-1 md:flex-none bg-sky-600 hover:bg-sky-500 text-white px-4 md:px-6 py-2 md:py-3 rounded font-bold transition text-xs shadow-lg shadow-sky-900/40">
+            🚀 CYCLE MATRIX
+        </button>
+    </div>
+</div>
+
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6 shrink-0">
+    <div class="glass p-3 md:p-4 rounded-xl text-center flex flex-col justify-center">
+        <span id="lbl-total" class="text-[10px] md:text-xs text-slate-400 font-bold block mb-1">TOTAL TRENDS</span>
+        <span class="text-xl md:text-2xl font-bold text-emerald-400" id="metric-total">0</span>
+    </div>
+    <div class="glass p-3 md:p-4 rounded-xl text-center flex flex-col justify-center">
+        <span id="lbl-location" class="text-[10px] md:text-xs text-slate-400 font-bold block mb-1">TOP REGION</span>
+        <span class="text-sm md:text-lg font-bold text-sky-400 truncate block" id="metric-location-val">Egypt 🇪🇬 / Saudi 🇸🇦</span>
+    </div>
+    <div class="glass p-3 md:p-4 rounded-xl text-center flex flex-col justify-center overflow-hidden">
+        <span id="lbl-category" class="text-[10px] md:text-xs text-slate-400 font-bold block mb-1">DOMINANT CAT</span>
+        <span class="text-sm md:text-lg font-bold text-purple-400 block truncate" id="metric-category">-</span>
+    </div>
+    <div class="glass p-3 md:p-4 rounded-xl text-center flex flex-col justify-center">
+        <span id="lbl-velocity" class="text-[10px] md:text-xs text-slate-400 font-bold block mb-1">MAX VELOCITY</span>
+        <span class="text-xl md:text-2xl font-bold text-red-500" id="metric-velocity">0.0</span>
+    </div>
+</div>
+
+<div class="flex overflow-x-auto gap-2 border-b border-slate-700 mb-4 shrink-0 pb-1 scrollbar-hide w-full">
+    <button onclick="switchTab('stream')" id="tab-btn-stream" class="tab-btn active shrink-0 px-4 py-2 border-b-2 border-transparent font-bold text-sm transition">Live Feed</button>
+    <button onclick="switchTab('analytics')" id="tab-btn-analytics" class="tab-btn shrink-0 px-4 py-2 border-b-2 border-transparent font-bold text-sm transition">Analytics</button>
+    <button onclick="switchTab('dataset')" id="tab-btn-dataset" class="tab-btn shrink-0 px-4 py-2 border-b-2 border-transparent font-bold text-sm transition">Dataset</button>
+</div>
+
+<div class="glass rounded-xl p-3 md:p-6 flex-1 overflow-y-auto min-h-0 w-full">
+
+    <div id="tab-content-stream" class="tab-content flex flex-col gap-4">
+        <div class="mb-2">
+            <label id="lbl-filter-source" class="text-xs text-slate-400 block mb-2 font-bold">FILTER BY SOURCE:</label>
+            <div class="flex flex-wrap gap-2" id="source-filters"></div>
+        </div>
+        <div id="ticker-feed" class="flex flex-col gap-3"></div>
+    </div>
+
+    <div id="tab-content-analytics" class="tab-content hidden grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        <div class="p-4 bg-slate-900/40 rounded-xl border border-slate-700 h-[300px] md:h-[380px] flex flex-col items-center w-full">
+            <h3 id="chart-title-src" class="text-sm font-bold text-slate-300 mb-2">Volume by Source</h3>
+            <div class="relative w-full h-full"><canvas id="chart-source"></canvas></div>
+        </div>
+        <div class="p-4 bg-slate-900/40 rounded-xl border border-slate-700 h-[300px] md:h-[380px] flex flex-col items-center w-full">
+            <h3 id="chart-title-cat" class="text-sm font-bold text-slate-300 mb-2">Trends by Category</h3>
+            <div class="relative w-full h-full"><canvas id="chart-category"></canvas></div>
+        </div>
+    </div>
+
+    <div id="tab-content-dataset" class="tab-content hidden flex flex-col gap-4">
+        <div class="flex flex-col md:flex-row gap-3">
+            <input type="text" id="table-search" oninput="renderMasterTable()" placeholder="Search trends..." class="w-full bg-slate-900 border border-slate-700 rounded px-4 py-3 text-sm text-white focus:outline-none focus:border-sky-500 shadow-inner">
+            <div class="flex gap-2 w-full md:w-auto">
+                <button onclick="exportToCSV()" id="btn-export-csv" class="flex-1 md:flex-none bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-3 rounded font-bold transition tracking-wider text-xs whitespace-nowrap text-center">
+                    ⬇️ EXPORT
+                </button>
+                <a href="/api/export/csv" id="btn-server-csv" class="flex-1 md:flex-none bg-sky-600 hover:bg-sky-500 text-white px-4 py-3 rounded font-bold transition tracking-wider text-xs whitespace-nowrap text-center flex items-center justify-center">
+                    ⬇️ SERVER CSV
+                </a>
+            </div>
+        </div>
+        <div class="overflow-x-auto rounded border border-slate-700 w-full block">
+            <table class="w-full text-start text-xs md:text-sm text-slate-300 min-w-[600px]">
+                <thead class="bg-slate-800 text-[10px] md:text-xs text-slate-400 uppercase font-bold tracking-wider">
+                    <tr>
+                        <th id="th-title" class="p-3 md:p-4 text-start">Title</th>
+                        <th id="th-source" class="p-3 md:p-4 text-start">Source</th>
+                        <th id="th-geo" class="p-3 md:p-4 text-start">Vector</th>
+                        <th id="th-category" class="p-3 md:p-4 text-start">Category</th>
+                        <th id="th-sentiment" class="p-3 md:p-4 text-center">Sentiment</th>
+                        <th id="th-velocity" class="p-3 md:p-4 text-end">Velocity</th>
+                        <th id="th-time" class="p-3 md:p-4 text-end whitespace-nowrap">Collected</th>
+                    </tr>
+                </thead>
+                <tbody id="master-table-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+// CENTRAL LOCALIZATION DICTIONARY
+const translations = {
+    en: {
+        title: "⚡CROSS-CHANNEL-PLATFORM",
+        syncing: "Synchronizing platform matrices...",
+        active: "Active — intercepting global feeds.",
+        disconnected: "Disconnected — attempting reconnect...",
+        cycleBtn: "🚀 CYCLE MATRIX",
+        totalTrends: "TOTAL TRENDS",
+        topRegion: "TOP REGION",
+        dominantCategory: "DOMINANT CAT",
+        maxVelocity: "MAX VELOCITY",
+        tabStream: "Live Feed",
+        tabAnalytics: "Analytics",
+        tabDataset: "Dataset",
+        filterLabel: "FILTER BY SOURCE:",
+        searchPlaceholder: "Search trends...",
+        exportBtn: "⬇️ EXPORT",
+        serverCsvBtn: "⬇️ SERVER CSV",
+        thTitle: "Title",
+        thSource: "Source",
+        thGeo: "Vector",
+        thCategory: "Category",
+        thSentiment: "Sentiment",
+        thVelocity: "Velocity",
+        thTime: "Collected",
+        oldBadge: "old",
+        chartSourceTitle: "Volume by Source",
+        chartCategoryTitle: "Trends by Category",
+        langBtn: "عربي"
+    },
+    ar: {
+        title: "⚡ منصة الاحداث",
+        syncing: "جارى جلب البيانات..",
+        active: "نشط — يتم استخلاض الترندات حالياً.",
+        disconnected: "انقطع الاتصال — جاري إعادة الاتصال...",
+        cycleBtn: "🚀 تشغيل المحرك",
+        totalTrends: "إجمالي التوجهات",
+        topRegion: "أعلى منطقة",
+        dominantCategory: "التصنيف السائد",
+        maxVelocity: "الزخم الأقصى",
+        tabStream: "البث المباشر",
+        tabAnalytics: "التحليلات",
+        tabDataset: "مجموعة البيانات",
+        filterLabel: "تصفية حسب المصدر:",
+        searchPlaceholder: "بحث في البيانات...",
+        exportBtn: "⬇️ تصدير",
+        serverCsvBtn: "⬇️ ملف الخادم",
+        thTitle: "العنوان",
+        thSource: "المصدر",
+        thGeo: "المتجه",
+        thCategory: "التصنيف",
+        thSentiment: "النمط العاطفي",
+        thVelocity: "مؤشر الزخم",
+        thTime: "الوقت",
+        oldBadge: "قديم",
+        chartSourceTitle: "الحجم حسب المصدر",
+        chartCategoryTitle: "التوجهات حسب التصنيف",
+        langBtn: "ENGLISH"
+    }
+};
+
+let currentLang = localStorage.getItem('matrix_lang') || 'en';
+let cachedData = [];
+let activeFilters = new Set();
+let sourceChartInstance = null;
+let categoryChartInstance = null;
+
+function applyLocalization() {
+    const labels = translations[currentLang];
+    const root = document.getElementById('html-root');
+
+    if (currentLang === 'ar') {
+        root.setAttribute('dir', 'rtl');
+        root.setAttribute('lang', 'ar');
+    } else {
+        root.setAttribute('dir', 'ltr');
+        root.setAttribute('lang', 'en');
+    }
+
+    document.getElementById('main-title').firstChild.textContent = labels.title + " ";
+    document.getElementById('refresh-btn').innerText = labels.cycleBtn;
+    document.getElementById('lbl-total').innerText = labels.totalTrends;
+    document.getElementById('lbl-location').innerText = labels.topRegion;
+    document.getElementById('lbl-category').innerText = labels.dominantCategory;
+    document.getElementById('lbl-velocity').innerText = labels.maxVelocity;
+
+    document.getElementById('tab-btn-stream').innerText = labels.tabStream;
+    document.getElementById('tab-btn-analytics').innerText = labels.tabAnalytics;
+    document.getElementById('tab-btn-dataset').innerText = labels.tabDataset;
+
+    document.getElementById('lbl-filter-source').innerText = labels.filterLabel;
+    document.getElementById('table-search').setAttribute('placeholder', labels.searchPlaceholder);
+    document.getElementById('btn-export-csv').innerText = labels.exportBtn;
+    document.getElementById('btn-server-csv').innerText = labels.serverCsvBtn;
+
+    document.getElementById('th-title').innerText = labels.thTitle;
+    document.getElementById('th-source').innerText = labels.thSource;
+    document.getElementById('th-geo').innerText = labels.thGeo;
+    document.getElementById('th-category').innerText = labels.thCategory;
+    document.getElementById('th-sentiment').innerText = labels.thSentiment;
+    document.getElementById('th-velocity').innerText = labels.thVelocity;
+    document.getElementById('th-time').innerText = labels.thTime;
+
+    document.getElementById('chart-title-src').innerText = labels.chartSourceTitle;
+    document.getElementById('chart-title-cat').innerText = labels.chartCategoryTitle;
+    document.getElementById('lang-toggle-btn').innerText = labels.langBtn;
+
+    renderFilters();
+    renderTickerFeed();
+    renderMasterTable();
+    buildCharts();
+}
+
+function toggleLanguage() {
+    currentLang = currentLang === 'en' ? 'ar' : 'en';
+    localStorage.setItem('matrix_lang', currentLang);
+    applyLocalization();
+}
+
+function timeAgo(isoStr) {
+    if (!isoStr) return '';
+    const now = new Date();
+    const then = new Date(isoStr);
+    const diffMs = now - then;
+    const diffMin = Math.floor(diffMs / 60000);
+    if (diffMin < 1) return 'just now';
+    if (diffMin < 60) return diffMin + 'm ago';
+    const diffHr = Math.floor(diffMin / 60);
+    if (diffHr < 24) return diffHr + 'h ago';
+    const diffDay = Math.floor(diffHr / 24);
+    return diffDay + 'd ago';
+}
+
+function timeAgoAr(isoStr) {
+    if (!isoStr) return '';
+    const now = new Date();
+    const then = new Date(isoStr);
+    const diffMs = now - then;
+    const diffMin = Math.floor(diffMs / 60000);
+    if (diffMin < 1) return 'الآن';
+    if (diffMin < 60) return 'منذ ' + diffMin + ' دقيقة';
+    const diffHr = Math.floor(diffMin / 60);
+    if (diffHr < 24) return 'منذ ' + diffHr + ' ساعة';
+    const diffDay = Math.floor(diffHr / 24);
+    return 'منذ ' + diffDay + ' يوم';
+}
+
+function getBadgeClass(source) {
+    const s = source.toLowerCase();
+    if (s.includes('twitter') || s.includes('x (twitter)')) return 'badge-x';
+    if (s.includes('facebook')) return 'badge-facebook';
+    if (s.includes('telegram')) return 'badge-telegram';
+    if (s.includes('google')) return 'badge-google';
+    if (s.includes('youtube')) return 'badge-youtube';
+    return 'badge-news';
+}
+
+function switchTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+    document.getElementById(`tab-content-${tabId}`).classList.remove('hidden');
+    document.getElementById(`tab-btn-${tabId}`).classList.add('active');
+}
+
+async function triggerManualCycle() {
+    const refreshBtn = document.getElementById('refresh-btn');
+    refreshBtn.disabled = true;
+    refreshBtn.style.opacity = '0.5';
+    try {
+        await fetch('/api/cycle/trigger', { method: 'POST' });
+    } catch (e) {
+        console.error("Failed to trigger sequence: ", e);
+    } finally {
+        setTimeout(() => {
+            refreshBtn.disabled = false;
+            refreshBtn.style.opacity = '1';
+        }, 5000);
+    }
+}
+
+async function pullMatrixData() {
+    try {
+        const response = await fetch('/api/trends');
+        const result = await response.json();
+        if (result.status === 'success') {
+            cachedData = result.data;
+            updateMetrics();
+            renderFilters();
+            renderTickerFeed();
+            renderMasterTable();
+            buildCharts();
+        }
+    } catch (e) {
+        console.error("Data synchronization failed: ", e);
+    }
+}
+
+function updateMetrics() {
+    if (!cachedData.length) return;
+    document.getElementById('metric-total').innerText = cachedData.length;
+
+    let maxVel = 0;
+    let categories = {};
+    cachedData.forEach(item => {
+        if (item.velocity_score > maxVel) maxVel = item.velocity_score;
+        categories[item.category] = (categories[item.category] || 0) + 1;
+    });
+
+    document.getElementById('metric-velocity').innerText = maxVel.toFixed(1);
+
+    let dominantCat = "-";
+    let maxCount = 0;
+    for (let cat in categories) {
+        if (categories[cat] > maxCount) {
+            maxCount = categories[cat];
+            dominantCat = cat;
+        }
+    }
+    document.getElementById('metric-category').innerText = dominantCat;
+}
+
+function renderFilters() {
+    const container = document.getElementById('source-filters');
+    const existingSelections = new Set(activeFilters);
+    container.innerHTML = '';
+
+    const sources = [...new Set(cachedData.map(item => item.source))];
+    sources.forEach(src => {
+        const btn = document.createElement('button');
+        const active = existingSelections.has(src);
+        btn.className = `badge ${getBadgeClass(src)} cursor-pointer transition-all border ${active ? 'border-sky-400 opacity-100 scale-105 shadow-md shadow-sky-500/20' : 'border-transparent opacity-40 hover:opacity-80'}`;
+        btn.innerText = src;
+        btn.onclick = () => toggleFilter(src);
+        container.appendChild(btn);
+    });
+}
+
+function toggleFilter(source) {
+    if (activeFilters.has(source)) {
+        activeFilters.delete(source);
+    } else {
+        activeFilters.add(source);
+    }
+    renderFilters();
+    renderTickerFeed();
+    renderMasterTable();
+}
+
+function renderTickerFeed() {
+    const container = document.getElementById('ticker-feed');
+    container.innerHTML = '';
+
+    const filtered = cachedData.filter(item => !activeFilters.size || activeFilters.has(item.source));
+
+    if (!filtered.length) {
+        container.innerHTML = `<p class="text-xs text-slate-500 italic p-4 text-center">No active signals match filters.</p>`;
+        return;
+    }
+
+    const labels = translations[currentLang];
+    filtered.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'glass p-3 md:p-4 rounded-xl border border-slate-800 hover:border-slate-700 transition flex flex-col gap-2';
+
+        div.innerHTML = `
+            <div class="flex flex-col md:flex-row justify-between items-start gap-2 md:gap-4">
+                <h3 class="font-bold text-sky-400 text-sm leading-relaxed order-2 md:order-1">
+                    <a href="${item.url}" target="_blank" class="hover:underline">${item.title}</a>
+                </h3>
+                <span class="badge ${getBadgeClass(item.source)} shrink-0 order-1 md:order-2 self-start">${item.source}</span>
+            </div>
+            <div class="text-[10px] md:text-xs text-slate-500 flex flex-wrap gap-2 md:gap-4 border-t border-slate-900 pt-2 mt-1">
+                <span><strong>${labels.thGeo}:</strong> ${item.geographic_vector || 'Global'}</span>
+                <span><strong>${labels.thCategory}:</strong> ${item.category}</span>
+                <span><strong>${labels.thSentiment}:</strong> ${item.sentiment || 'Neutral ⚪'}</span>
+                <span class="text-red-400"><strong>${labels.thVelocity}:</strong> ${item.velocity_score}</span>
+                <span><strong>${labels.thTime}:</strong> ${currentLang === 'ar' ? timeAgoAr(item.collected_at) : timeAgo(item.collected_at)}</span>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function renderMasterTable() {
+    const tbody = document.getElementById('master-table-body');
+    tbody.innerHTML = '';
+
+    const searchQuery = document.getElementById('table-search').value.toLowerCase();
+    const filtered = cachedData.filter(item => {
+        const matchesFilter = !activeFilters.size || activeFilters.has(item.source);
+        const matchesSearch = item.title.toLowerCase().includes(searchQuery) || item.source.toLowerCase().includes(searchQuery);
+        return matchesFilter && matchesSearch;
+    });
+
+    filtered.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-slate-800 hover:bg-slate-900/30 transition';
+        tr.innerHTML = `
+            <td class="p-3 md:p-4 font-bold text-slate-200 text-start max-w-[200px] md:max-w-sm truncate"><a href="${item.url}" target="_blank" class="text-sky-400 hover:underline">${item.title}</a></td>
+            <td class="p-3 md:p-4 text-start"><span class="badge ${getBadgeClass(item.source)}">${item.source}</span></td>
+            <td class="p-3 md:p-4 text-start">${item.geographic_vector || 'Global'}</td>
+            <td class="p-3 md:p-4 text-start text-purple-400">${item.category}</td>
+            <td class="p-3 md:p-4 text-center whitespace-nowrap">${item.sentiment || 'Neutral ⚪'}</td>
+            <td class="p-3 md:p-4 text-end font-bold text-red-400">${item.velocity_score}</td>
+            <td class="p-3 md:p-4 text-end text-slate-500 text-[10px] whitespace-nowrap">${currentLang === 'ar' ? timeAgoAr(item.collected_at) : timeAgo(item.collected_at)}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function buildCharts() {
+    if (!cachedData.length) return;
+
+    let srcCounts = {};
+    let catCounts = {};
+    cachedData.forEach(item => {
+        srcCounts[item.source] = (srcCounts[item.source] || 0) + 1;
+        catCounts[item.category] = (catCounts[item.category] || 0) + 1;
+    });
+
+    if (sourceChartInstance) sourceChartInstance.destroy();
+    const ctxSrc = document.getElementById('chart-source').getContext('2d');
+    sourceChartInstance = new Chart(ctxSrc, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(srcCounts),
+            datasets: [{
+                data: Object.values(srcCounts),
+                backgroundColor: ['#1877F2', '#26A5E4', '#059669', '#000000', '#EA4335', '#FF0000', '#a855f7'],
+                borderWidth: 1,
+                borderColor: '#1e293b'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { family: 'monospace', size: 10 } } } }
+        }
+    });
+
+    if (categoryChartInstance) categoryChartInstance.destroy();
+    const ctxCat = document.getElementById('chart-category').getContext('2d');
+    categoryChartInstance = new Chart(ctxCat, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(catCounts),
+            datasets: [{
+                label: currentLang === 'en' ? 'Volume' : 'الحجم',
+                data: Object.values(catCounts),
+                backgroundColor: 'rgba(56, 189, 248, 0.4)',
+                borderColor: '#38bdf8',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { ticks: { color: '#94a3b8', font: { family: 'monospace', size: 10 } }, grid: { color: '#334155' } },
+                y: { ticks: { color: '#94a3b8', font: { family: 'monospace', size: 10 } }, grid: { color: '#334155' } }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
+}
+
+function exportToCSV() {
+    const headers = ["Title", "Source", "Geographic Vector", "Category", "Sentiment", "Velocity Score", "URL", "Collected At"];
+    let rows = cachedData.map(item => [
+        `"${item.title.replace(/"/g, '""')}"`,
+        `"${item.source}"`,
+        `"${item.geographic_vector || 'Global'}"`,
+        `"${item.category}"`,
+        `"${item.sentiment || 'Neutral'}"`,
+        item.velocity_score,
+        `"${item.url}"`,
+        `"${item.collected_at || ''}"`
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers.join(",")].concat(rows.map(e => e.join(","))).join("\n");
+    const link = document.createElement("a");
+    link.setAttribute("href", encodeURI(csvContent));
+    link.setAttribute("download", `Matrix_Export_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function connectWebSocket() {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
+    const dot = document.getElementById('connection-status').children;
+    const statusText = document.getElementById('status-text');
+
+    ws.onopen = () => {
+        statusText.innerText = translations[currentLang].active;
+        pullMatrixData();
+    };
+    ws.onmessage = (e) => {
+        if (JSON.parse(e.data).type === "refresh_data") pullMatrixData();
+    };
+    ws.onclose = () => {
+        statusText.innerText = translations[currentLang].disconnected;
+        setTimeout(connectWebSocket, 5000);
+    };
+}
+
+applyLocalization();
+connectWebSocket();
+setInterval(pullMatrixData, 60000);
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+}
+</script>
+</body>
+</html>

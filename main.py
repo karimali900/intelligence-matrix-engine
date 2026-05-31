@@ -3,6 +3,8 @@ import csv
 import io
 import logging
 import os
+import os
+
 import re
 import smtplib
 import time
@@ -20,7 +22,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from supabase import create_client, Client
 from fastapi.staticfiles import StaticFiles
-from flask import send_from_directory
+
 logger = logging.getLogger("matrix")
 logging.basicConfig(
     level=logging.INFO,
@@ -219,15 +221,10 @@ def detect_sentiment(text: str) -> str:
 
 
 
-# ... your other routes ...
+#  your other routes
 
-@app.route('/.well-known/assetlinks.json')
-def serve_assetlinks():
-    return send_from_directory(
-        os.path.join(app.root_path, 'static'),
-        'assetlinks.json',
-        mimetype='application/json'
-    )
+
+
 async def fetch_rss(client: httpx.AsyncClient, url: str, source_tag: str) -> list[dict]:
     async with SCRAPE_SEMAPHORE:
         for attempt in range(2):
@@ -509,7 +506,9 @@ async def intelligence_agent(request: Request, q: str):
         logger.error("AI Agent generation error: %s", e)
         return {"status": "error", "message": f"AI Generation failed: {str(e)}"}
 
-
+@app.get("/.well-known/assetlinks.json")
+async def serve_assetlinks():
+    return FileResponse("static/assetlinks.json", media_type="application/json")
 @app.get("/sw.js")
 async def service_worker():
     return FileResponse("static/sw.js", media_type="application/javascript")

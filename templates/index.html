@@ -28,11 +28,7 @@
 <body class="p-4 md:p-8 h-[100dvh] flex flex-col overflow-hidden">
 
 <div style="position: absolute; top: 20px; left: 55%; transform: translateX(-50%); display: flex; align-items: center; gap: 15px; z-index: 1000; background: rgba(0, 0, 0, 0.85); padding: 10px 25px; border-radius: 50px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
-<<<<<<< HEAD
     <img src="/static/karim.png" alt="Karim Arafa" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #555; background-color: #111;">
-=======
-    <img src="/static/Karim.png" alt="Karim Arafa" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #555; background-color: #111;">
->>>>>>> a4e6c3a4c17e94be3897351cb7db21c1d17ba6d3
     <div style="display: flex; flex-direction: column; justify-content: center; text-align: left;">
         <span style="color: #fff; font-family: monospace; font-size: 14px; font-weight: bold; letter-spacing: 1px;">Karim Arafa</span>
         <span style="color: #aaa; font-family: Arial, sans-serif; font-size: 13px;">كريم عرفة</span>
@@ -42,7 +38,7 @@
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 shrink-0 gap-4">
     <div class="w-full md:w-auto">
         <h1 id="main-title" class="text-xl md:text-3xl font-bold text-sky-400 flex items-center gap-2 md:gap-3 leading-tight">
-            ⚡ CROSS-CHANNEL PLATFORM 
+            ⚡ CROSS-CHANNEL PLATFORM
             <span id="connection-status" class="flex h-3 w-3 relative shrink-0">
                 <span class="animate-ping absolute inline-flex h-3 w-3 rounded-full bg-red-400 opacity-75"></span>
                 <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
@@ -87,18 +83,10 @@
 </div>
 
 <div class="glass rounded-xl p-3 md:p-6 flex-1 overflow-y-auto min-h-0 w-full">
-<<<<<<< HEAD
-=======
-    <!-- Live Feed Stream Tab -->
->>>>>>> a4e6c3a4c17e94be3897351cb7db21c1d17ba6d3
     <div id="tab-content-stream" class="tab-content flex flex-col gap-4">
         <div class="mb-2">
             <div class="flex justify-between items-center mb-2">
                 <label id="lbl-filter-source" class="text-xs text-slate-400 font-bold">FILTER BY SOURCE:</label>
-<<<<<<< HEAD
-=======
-                <!-- Interactive Timeline Sorting Matrix Toggle Control -->
->>>>>>> a4e6c3a4c17e94be3897351cb7db21c1d17ba6d3
                 <button onclick="toggleSortOrder()" id="sort-toggle-btn" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-sky-400 px-3 py-1 rounded text-xs font-bold transition shadow-sm"></button>
             </div>
             <div class="flex flex-wrap gap-2" id="source-filters"></div>
@@ -106,7 +94,6 @@
         <div id="ticker-feed" class="flex flex-col gap-3"></div>
     </div>
 
-    <!-- Analytics Charts Tab -->
     <div id="tab-content-analytics" class="tab-content hidden grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
         <div class="p-4 bg-slate-900/40 rounded-xl border border-slate-700 h-[300px] md:h-[380px] flex flex-col items-center w-full">
             <h3 id="chart-title-src" class="text-sm font-bold text-slate-300 mb-2">Volume by Source</h3>
@@ -118,7 +105,6 @@
         </div>
     </div>
 
-    <!-- Master Dataset Tab -->
     <div id="tab-content-dataset" class="tab-content hidden flex flex-col gap-4">
         <div class="flex flex-col md:flex-row gap-3">
             <input type="text" id="table-search" oninput="renderMasterTable()" placeholder="Search trends..." class="w-full bg-slate-900 border border-slate-700 rounded px-4 py-3 text-sm text-white focus:outline-none focus:border-sky-500 shadow-inner">
@@ -182,12 +168,8 @@ const translations = {
         chartCategoryTitle: "Trends by Category",
         langBtn: "عربي",
         sortNewest: "⏳ Newest First",
-<<<<<<< HEAD
         sortOldest: "⏳ Oldest First",
         sortAccel: "🔥 Highest Acceleration"
-=======
-        sortOldest: "⏳ Oldest First"
->>>>>>> a4e6c3a4c17e94be3897351cb7db21c1d17ba6d3
     },
     ar: {
         title: "⚡ منصة الاحداث",
@@ -218,23 +200,15 @@ const translations = {
         chartCategoryTitle: "التوجهات حسب التصنيف",
         langBtn: "ENGLISH",
         sortNewest: "⏳ الأحدث أولاً",
-<<<<<<< HEAD
         sortOldest: "⏳ الأقدم أولاً",
         sortAccel: "🔥 الأعلى تسارعاً"
-=======
-        sortOldest: "⏳ الأقدم أولاً"
->>>>>>> a4e6c3a4c17e94be3897351cb7db21c1d17ba6d3
     }
 };
 
 let currentLang = localStorage.getItem('matrix_lang') || 'en';
 let cachedData = [];
 let activeFilters = new Set();
-<<<<<<< HEAD
 let currentSortOrder = 'time_desc'; // States: 'time_desc', 'accel_desc', 'time_asc'
-=======
-let currentSortOrder = 'desc'; // Default state is 'desc' (Newest to Oldest)
->>>>>>> a4e6c3a4c17e94be3897351cb7db21c1d17ba6d3
 let sourceChartInstance = null;
 let categoryChartInstance = null;
 
@@ -287,14 +261,10 @@ function applyLocalization() {
 }
 
 function toggleSortOrder() {
-<<<<<<< HEAD
     if (currentSortOrder === 'time_desc') currentSortOrder = 'accel_desc';
     else if (currentSortOrder === 'accel_desc') currentSortOrder = 'time_asc';
     else currentSortOrder = 'time_desc';
 
-=======
-    currentSortOrder = currentSortOrder === 'desc' ? 'asc' : 'desc';
->>>>>>> a4e6c3a4c17e94be3897351cb7db21c1d17ba6d3
     updateSortButtonUI();
     renderTickerFeed();
     renderMasterTable();
@@ -303,7 +273,6 @@ function toggleSortOrder() {
 function updateSortButtonUI() {
     const btn = document.getElementById('sort-toggle-btn');
     const labels = translations[currentLang];
-<<<<<<< HEAD
 
     if (currentSortOrder === 'time_desc') {
         btn.innerText = labels.sortNewest;
@@ -315,9 +284,6 @@ function updateSortButtonUI() {
         btn.innerText = labels.sortOldest;
         btn.className = "bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-400 px-3 py-1 rounded text-xs font-bold transition shadow-sm";
     }
-=======
-    btn.innerText = currentSortOrder === 'desc' ? labels.sortNewest : labels.sortOldest;
->>>>>>> a4e6c3a4c17e94be3897351cb7db21c1d17ba6d3
 }
 
 function toggleLanguage() {
@@ -443,13 +409,8 @@ function renderFilters() {
     container.innerHTML = '';
 
     const sources = [
-<<<<<<< HEAD
         "General News", "Al Jazeera", "France24", "CNN Arabic",
         "BBC Arabic", "X (Twitter)", "RT Arabic", "DW Arabic",
-=======
-        "General News", "Al Jazeera", "France24", "CNN Arabic", 
-        "BBC Arabic", "X (Twitter)", "RT Arabic", "DW Arabic", 
->>>>>>> a4e6c3a4c17e94be3897351cb7db21c1d17ba6d3
         "Facebook", "Telegram", "Google Trends", "YouTube"
     ];
 
@@ -490,17 +451,7 @@ function renderTickerFeed() {
     container.innerHTML = '';
 
     let filtered = cachedData.filter(item => !activeFilters.size || activeFilters.has(item.source));
-<<<<<<< HEAD
     filtered = sortMatrixArray(filtered);
-=======
-
-    // Dynamic Cron Sorting Matrix
-    filtered.sort((a, b) => {
-        const timeA = new Date(a.collected_at || 0);
-        const timeB = new Date(b.collected_at || 0);
-        return currentSortOrder === 'desc' ? timeB - timeA : timeA - timeB;
-    });
->>>>>>> a4e6c3a4c17e94be3897351cb7db21c1d17ba6d3
 
     if (!filtered.length) {
         container.innerHTML = `<p class="text-xs text-slate-500 italic p-4 text-center">No active signals match filters.</p>`;
@@ -542,16 +493,7 @@ function renderMasterTable() {
         return matchesFilter && matchesSearch;
     });
 
-<<<<<<< HEAD
     filtered = sortMatrixArray(filtered);
-=======
-    // Dynamic Table Sorting Matrix
-    filtered.sort((a, b) => {
-        const timeA = new Date(a.collected_at || 0);
-        const timeB = new Date(b.collected_at || 0);
-        return currentSortOrder === 'desc' ? timeB - timeA : timeA - timeB;
-    });
->>>>>>> a4e6c3a4c17e94be3897351cb7db21c1d17ba6d3
 
     filtered.forEach(item => {
         const tr = document.createElement('tr');

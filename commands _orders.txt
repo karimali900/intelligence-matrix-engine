@@ -1,0 +1,5 @@
+Edit the code in /home/karim/Documents/trends/main.py.
+
+Reload the service: systemctl --user daemon-reload
+
+Restart the service: systemctl --user restart matrix.service

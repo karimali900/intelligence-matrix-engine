@@ -18,7 +18,8 @@ self.addEventListener('install', (event) => {
   // Force the waiting service worker to become the active service worker instantly
   self.skipWaiting();
 });
-
+// Inside sw.js
+const CACHE_NAME = 'matrix-cache-v2'; // Change v1 to v2
 // 2. Activate Phase: Drop old caches instantly when CACHE_NAME changes
 self.addEventListener('activate', (event) => {
   event.waitUntil(

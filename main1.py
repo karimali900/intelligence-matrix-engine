@@ -74,11 +74,7 @@ RSS_FEEDS = [
     ("https://news.google.com/rss/search?q=CNNArabic+when:1d&hl=ar&gl=EG&ceid=EG:ar", "CNN Arabic"),
     ("https://news.google.com/rss/search?q=BBCArabic+when:1d&hl=ar&gl=EG&ceid=EG:ar", "BBC Arabic"),
     ("https://news.google.com/rss/search?q=Twitter+Egypt+Saudi+when:1d&hl=ar&gl=EG&ceid=EG:ar", "X (Twitter)"),
-<<<<<<< HEAD
     ("https://news.google.com/rss/search?q=RT+Arabic+when:1d&hl=ar&gl=EG&ceid=EG:ar", "RT Arabic"),
-=======
-     ("https://news.google.com/rss/search?q=RT+Arabic+when:1d&hl=ar&gl=EG&ceid=EG:ar", "RT Arabic"),
->>>>>>> a4e6c3a4c17e94be3897351cb7db21c1d17ba6d3
     ("https://news.google.com/rss/search?q=DW+Arabic+when:1d&hl=ar&gl=EG&ceid=EG:ar", "DW Arabic"),
     ("https://news.google.com/rss/search?q=Facebook+Egypt+Saudi+when:1d&hl=ar&gl=EG&ceid=EG:ar", "Facebook")
 ]
@@ -127,29 +123,6 @@ def send_email_alert(title: str, score: float, source: str, category: str):
     except (smtplib.SMTPException, OSError) as e:
         logger.error("Email error: %s", e)
 
-# ==========================================
-# MATRIX ACCELERATION MATHEMATICS
-# ==========================================
-def calculate_trend_acceleration(prev_ema_short: float, prev_ema_long: float, current_velocity: float):
-    """
-    Applies an Exponential Moving Average (EMA) filter on incoming velocity scores.
-    Determines whether a signal path is exploding upwards or plateauing.
-    """
-    ALPHA_SHORT = 0.30  # High weight on immediate tracking intervals
-    ALPHA_LONG = 0.05   # Low weight, tracks foundational historical momentum
-
-    if prev_ema_short == 0.0:
-        return current_velocity, current_velocity, 0.0
-
-    try:
-        new_ema_short = (current_velocity * ALPHA_SHORT) + (prev_ema_short * (1 - ALPHA_SHORT))
-        new_ema_long = (current_velocity * ALPHA_LONG) + (prev_ema_long * (1 - ALPHA_LONG))
-        acceleration = new_ema_short - new_ema_long
-        return round(new_ema_short, 4), round(new_ema_long, 4), round(acceleration, 4)
-    except Exception as e:
-        logger.error(f"Mathematical execution failure on curve matrix: {e}")
-        return current_velocity, current_velocity, 0.0
-
 def detect_country(text: str) -> str:
     t = text.lower()
     eg_keywords = [
@@ -158,7 +131,7 @@ def detect_country(text: str) -> str:
         "الجنيه", "المركزي المصري", "العاصمة الإدارية", "الزمالك", "المنتخب المصري"
     ]
     sa_keywords = [
-        "السعودية", "الرياض", "الهلال", "saudi", "نيوم", "بن سلمان",
+        "السعودية", "الرياض", "الهلال", "saudi", "نيوم", "بن سلمان", 
         "النصر", "جدة", "المملكة العربية", "آل سعود", "أرامكو"
     ]
     if any(k in t for k in eg_keywords):
@@ -190,10 +163,6 @@ def detect_sentiment(text: str) -> str:
         return "Positive 🟢"
     return "Neutral ⚪"
 
-<<<<<<< HEAD
-=======
-
->>>>>>> a4e6c3a4c17e94be3897351cb7db21c1d17ba6d3
 async def fetch_rss(client: httpx.AsyncClient, url: str, source_tag: str) -> list[dict]:
     async with SCRAPE_SEMAPHORE:
         for attempt in range(2):
@@ -223,10 +192,6 @@ async def fetch_rss(client: httpx.AsyncClient, url: str, source_tag: str) -> lis
                 logger.error("Unexpected error fetching %s [%s]: %s", source_tag, type(e).__name__, e)
                 break
         return []
-<<<<<<< HEAD
-=======
-
->>>>>>> a4e6c3a4c17e94be3897351cb7db21c1d17ba6d3
 
 async def collect_telegram(client: httpx.AsyncClient) -> list[dict]:
     items = []
@@ -256,16 +221,11 @@ def _sync_collect_youtube() -> list[dict]:
     ydl_opts = {"quiet": True, "extract_flat": False, "skip_download": True}
     per_query = max(3, SCRAPE_LIMIT // len(queries))
     yesterday_str = (datetime.now() - timedelta(days=1)).strftime("%Y%m%d")
-    ydl_opts = {
-    'quiet': True,
-    'no_warnings': True,     # This helps suppress log spam
-    'js_runtime': 'node',    # This tells yt-dlp to use the node engine we installed
-    'format': 'bestaudio/best'
-}
+
     for q in queries:
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                res = ydl.extract_info(f"ytsearch{per_query}:{q}", download=False)
+                res = ydl.extract_info(f"ytsearchdate{per_query}:{q}", download=False)
                 for entry in res.get("entries", []):
                     upload_date = entry.get("upload_date")
                     if upload_date and upload_date >= yesterday_str and entry.get("title"):
@@ -316,30 +276,9 @@ async def ingestion_cycle():
     logger.info("Collected %d raw items across all vectors", len(pool))
 
     for item in pool:
-        # --- INTELLIGENCE-DRIVEN SCORING ---
         category = detect_category(item["title"])
         geo = detect_country(item["title"])
         sentiment = detect_sentiment(item["title"])
-<<<<<<< HEAD
-=======
-
-        # 1. Base Multiplier
-        category_weight = CATEGORY_WEIGHTS.get(category, 1.0)
-
-        # 2. Source Credibility (Boost News, lower entertainment)
-        source_bias = 1.2 if item["source"] in ["Al Jazeera", "BBC Arabic", "CNN Arabic"] else 1.0
-
-        # 3. Sentiment Boost (Critical news is higher priority for an Intel Engine)
-        sentiment_bias = 1.3 if sentiment == "Critical 🔴" else 1.0
-
-        # 4. Fluff Damper (Penalize viral-sounding sources if they lack news keywords)
-        # If it's a social source but NOT economy/politics/tech, reduce the weight significantly
-        fluff_damper = 0.6 if (item["source"] in ["YouTube", "Google Trends"] and category == "society") else 1.0
-
-        # Final Score Formula: (Raw Metrics * Weights) * Biases
-        raw_score = (item["metrics"] * 0.0005) * category_weight * source_bias * sentiment_bias * fluff_damper
-        score = min(round(raw_score, 2), 100.0)
->>>>>>> a4e6c3a4c17e94be3897351cb7db21c1d17ba6d3
 
         category_weight = CATEGORY_WEIGHTS.get(category, 1.0)
         source_bias = 1.2 if item["source"] in ["Al Jazeera", "BBC Arabic", "CNN Arabic"] else 1.0
@@ -349,40 +288,10 @@ async def ingestion_cycle():
         raw_score = (item["metrics"] * 0.0005) * category_weight * source_bias * sentiment_bias * fluff_damper
         score = min(round(raw_score, 2), 100.0)
 
-        # ----------------------------------------------------
-        # THE MATRIX CURVE ENGINE: Fetch past state and calculate
-        # ----------------------------------------------------
-        prev_ema_short = 0.0
-        prev_ema_long = 0.0
-
-        if supabase:
-            try:
-                # Query the latest exact match for this trend to build the curve history
-                db_resp = supabase.table("trends").select("velocity_ema_short, velocity_ema_long")\
-                                  .eq("title", item["title"])\
-                                  .eq("source", item["source"])\
-                                  .order("collected_at", desc=True).limit(1).execute()
-                if db_resp.data:
-                    prev_ema_short = float(db_resp.data[0].get("velocity_ema_short", 0.0))
-                    prev_ema_long = float(db_resp.data[0].get("velocity_ema_long", 0.0))
-            except Exception as e:
-                logger.warning("Could not fetch previous record for trend curve math: %s", e)
-
-        ema_short, ema_long, accel = calculate_trend_acceleration(prev_ema_short, prev_ema_long, score)
-
-        # Construct final payload with acceleration metadata
         data = {
-            "title": item["title"],
-            "source": item["source"],
-            "geographic_vector": geo,
-            "category": category,
-            "velocity_score": score,
-            "velocity_ema_short": ema_short,
-            "velocity_ema_long": ema_long,
-            "acceleration_score": accel,
-            "url": item["url"],
-            "sentiment": sentiment,
-            "collected_at": datetime.utcnow().isoformat(),
+            "title": item["title"], "source": item["source"], "geographic_vector": geo,
+            "category": category, "velocity_score": score, "url": item["url"],
+            "sentiment": sentiment, "collected_at": datetime.utcnow().isoformat(),
         }
 
         if score >= 85.0 and item["title"] not in ALREADY_ALERTED:
@@ -398,19 +307,10 @@ async def ingestion_cycle():
 
     if supabase:
         try:
-<<<<<<< HEAD
             prune_cutoff = (datetime.utcnow() - timedelta(hours=24)).isoformat()
             supabase.table("trends").delete().lt("collected_at", prune_cutoff).execute()
             logger.info("Database pruned: Removed records older than 24 hours")
         except Exception as e: logger.error("DB pruning error: %s", e)
-=======
-            # Tightened to 24 hours for peak database storage efficiency
-            prune_cutoff = (datetime.utcnow() - timedelta(hours=24)).isoformat()
-            supabase.table("trends").delete().lt("collected_at", prune_cutoff).execute()
-            logger.info("Database pruned: Removed records older than 24 hours")
-        except Exception as e:
-            logger.error("DB pruning error: %s", e)
->>>>>>> a4e6c3a4c17e94be3897351cb7db21c1d17ba6d3
 
     await manager.broadcast({"type": "refresh_data"})
     logger.info("Ingestion cycle complete — %d upserted", len(pool))
@@ -432,7 +332,6 @@ app = FastAPI(title="Intelligence Matrix Engine", lifespan=lifespan)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-<<<<<<< HEAD
 @app.get("/api/agent")
 async def get_agent_insight(q: str):
     context_brief = "No live database records found."
@@ -440,25 +339,6 @@ async def get_agent_insight(q: str):
         try:
             cutoff = (datetime.utcnow() - timedelta(hours=24)).isoformat()
             db_resp = supabase.table("trends").select("title,source,category,sentiment").gte("collected_at", cutoff).order("velocity_score", desc=True).limit(25).execute()
-=======
-
-# --- NEW: AI AGENT INTERFACE ENDPOINT ---
-@app.get("/api/agent")
-async def get_agent_insight(q: str):
-    # 1. Fetch latest real-time context from Supabase to ground the AI
-    context_brief = "No live database records found."
-    if supabase:
-        try:
-            # Update AI to look at the top 25 highest-velocity items from the last 24 hours
-            cutoff = (datetime.utcnow() - timedelta(hours=24)).isoformat()
-            db_resp = supabase.table("trends") \
-                .select("title,source,category,sentiment") \
-                .gte("collected_at", cutoff) \
-                .order("velocity_score", desc=True) \
-                .limit(25) \
-                .execute()
-
->>>>>>> a4e6c3a4c17e94be3897351cb7db21c1d17ba6d3
             if db_resp.data:
                 context_brief = "\n".join([f"- [{row['category']}] ({row['sentiment']}) {row['title']} (المصدر: {row['source']})" for row in db_resp.data])
         except Exception as e:
@@ -485,19 +365,13 @@ async def get_agent_insight(q: str):
         logger.error("AI Agent error: %s", e)
         return {"status": "error", "message": f"AI Generation failed: {str(e)}"}
 
-
 @app.get("/.well-known/assetlinks.json")
 async def serve_assetlinks():
     return FileResponse("static/assetlinks.json", media_type="application/json")
 
-<<<<<<< HEAD
-=======
-
->>>>>>> a4e6c3a4c17e94be3897351cb7db21c1d17ba6d3
 @app.get("/sw.js")
 async def service_worker():
     return FileResponse("static/sw.js", media_type="application/javascript")
-
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_dashboard(request: Request):
@@ -507,19 +381,8 @@ async def serve_dashboard(request: Request):
 async def get_live_trends():
     if not supabase: return {"status": "error", "message": "Database not configured"}
     try:
-<<<<<<< HEAD
         cutoff = (datetime.utcnow() - timedelta(hours=24)).isoformat()
         response = supabase.table("trends").select("*").gte("collected_at", cutoff).order("velocity_score", desc=True).limit(500).execute()
-=======
-        # Match dashboard layout to the tight 24-hour window
-        cutoff = (datetime.utcnow() - timedelta(hours=24)).isoformat()
-        response = supabase.table("trends") \
-            .select("*") \
-            .gte("collected_at", cutoff) \
-            .order("velocity_score", desc=True) \
-            .limit(500) \
-            .execute()
->>>>>>> a4e6c3a4c17e94be3897351cb7db21c1d17ba6d3
         return {"status": "success", "data": response.data}
     except Exception as e:
         logger.error("Trends fetch error: %s", e)
@@ -529,27 +392,16 @@ async def get_live_trends():
 async def export_csv():
     if not supabase: return {"status": "error", "message": "Database not configured"}
     try:
-<<<<<<< HEAD
         cutoff = (datetime.utcnow() - timedelta(hours=24)).isoformat()
         response = supabase.table("trends").select("*").gte("collected_at", cutoff).order("velocity_score", desc=True).limit(1000).execute()
-=======
-        # Export restricted to the current 24-hour window
-        cutoff = (datetime.utcnow() - timedelta(hours=24)).isoformat()
-        response = supabase.table("trends") \
-            .select("*") \
-            .gte("collected_at", cutoff) \
-            .order("velocity_score", desc=True) \
-            .limit(1000) \
-            .execute()
->>>>>>> a4e6c3a4c17e94be3897351cb7db21c1d17ba6d3
         data = response.data
     except Exception as e: return {"status": "error", "message": str(e)}
 
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(["Title", "Source", "Geographic Vector", "Category", "Sentiment", "Velocity Score", "Acceleration Score", "URL", "Collected At"])
+    writer.writerow(["Title", "Source", "Geographic Vector", "Category", "Sentiment", "Velocity Score", "URL", "Collected At"])
     for row in data:
-        writer.writerow([row.get("title", ""), row.get("source", ""), row.get("geographic_vector", ""), row.get("category", ""), row.get("sentiment", "Neutral ⚪"), row.get("velocity_score", 0), row.get("acceleration_score", 0), row.get("url", ""), row.get("collected_at", "")])
+        writer.writerow([row.get("title", ""), row.get("source", ""), row.get("geographic_vector", ""), row.get("category", ""), row.get("sentiment", "Neutral ⚪"), row.get("velocity_score", 0), row.get("url", ""), row.get("collected_at", "")])
     output.seek(0)
     return StreamingResponse(iter([output.getvalue()]), media_type="text/csv", headers={"Content-Disposition": f"attachment; filename=trends_export_{int(time.time())}.csv"})
 
@@ -580,10 +432,6 @@ if __name__ == "__main__":
     import uvicorn
     import webbrowser
     import threading
-<<<<<<< HEAD
-=======
-
->>>>>>> a4e6c3a4c17e94be3897351cb7db21c1d17ba6d3
     def open_browser():
         time.sleep(2)
         webbrowser.open("http://127.0.0.1:8001")

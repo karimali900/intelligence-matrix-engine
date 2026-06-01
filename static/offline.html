@@ -21,6 +21,7 @@
         .badge-google { background: #EA4335; }
         .badge-youtube { background: #FF0000; }
         .tab-btn.active { border-color: #38bdf8; color: #38bdf8; background: rgba(56, 189, 248, 0.1); }
+        /* Hide scrollbars for a clean terminal look */
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
@@ -83,20 +84,14 @@
 </div>
 
 <div class="glass rounded-xl p-3 md:p-6 flex-1 overflow-y-auto min-h-0 w-full">
-    <!-- Live Feed Stream Tab -->
     <div id="tab-content-stream" class="tab-content flex flex-col gap-4">
         <div class="mb-2">
-            <div class="flex justify-between items-center mb-2">
-                <label id="lbl-filter-source" class="text-xs text-slate-400 font-bold">FILTER BY SOURCE:</label>
-                <!-- Interactive Timeline Sorting Matrix Toggle Control -->
-                <button onclick="toggleSortOrder()" id="sort-toggle-btn" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-sky-400 px-3 py-1 rounded text-xs font-bold transition shadow-sm"></button>
-            </div>
+            <label id="lbl-filter-source" class="text-xs text-slate-400 block mb-2 font-bold">FILTER BY SOURCE:</label>
             <div class="flex flex-wrap gap-2" id="source-filters"></div>
         </div>
         <div id="ticker-feed" class="flex flex-col gap-3"></div>
     </div>
 
-    <!-- Analytics Charts Tab -->
     <div id="tab-content-analytics" class="tab-content hidden grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
         <div class="p-4 bg-slate-900/40 rounded-xl border border-slate-700 h-[300px] md:h-[380px] flex flex-col items-center w-full">
             <h3 id="chart-title-src" class="text-sm font-bold text-slate-300 mb-2">Volume by Source</h3>
@@ -108,7 +103,6 @@
         </div>
     </div>
 
-    <!-- Master Dataset Tab -->
     <div id="tab-content-dataset" class="tab-content hidden flex flex-col gap-4">
         <div class="flex flex-col md:flex-row gap-3">
             <input type="text" id="table-search" oninput="renderMasterTable()" placeholder="Search trends..." class="w-full bg-slate-900 border border-slate-700 rounded px-4 py-3 text-sm text-white focus:outline-none focus:border-sky-500 shadow-inner">
@@ -169,14 +163,12 @@ const translations = {
         oldBadge: "old",
         chartSourceTitle: "Volume by Source",
         chartCategoryTitle: "Trends by Category",
-        langBtn: "عربي",
-        sortNewest: "⏳ Newest First",
-        sortOldest: "⏳ Oldest First"
+        langBtn: "عربي"
     },
     ar: {
         title: "⚡ منصة الاحداث",
         syncing: "جارى جلب البيانات..",
-        active: "نشط — يتم استخلاض الترندات حالياً.",
+        active: "نشط — يتم استخلاص الترندات حالياً.",
         disconnected: "انقطع الاتصال — جاري إعادة الاتصال...",
         cycleBtn: "🚀 تشغيل المحرك",
         totalTrends: "إجمالي التوجهات",
@@ -200,16 +192,13 @@ const translations = {
         oldBadge: "قديم",
         chartSourceTitle: "الحجم حسب المصدر",
         chartCategoryTitle: "التوجهات حسب التصنيف",
-        langBtn: "ENGLISH",
-        sortNewest: "⏳ الأحدث أولاً",
-        sortOldest: "⏳ الأقدم أولاً"
+        langBtn: "ENGLISH"
     }
 };
 
 let currentLang = localStorage.getItem('matrix_lang') || 'en';
 let cachedData = [];
 let activeFilters = new Set();
-let currentSortOrder = 'desc'; // Default state is 'desc' (Newest to Oldest)
 let sourceChartInstance = null;
 let categoryChartInstance = null;
 
@@ -253,24 +242,10 @@ function applyLocalization() {
     document.getElementById('chart-title-cat').innerText = labels.chartCategoryTitle;
     document.getElementById('lang-toggle-btn').innerText = labels.langBtn;
 
-    updateSortButtonUI();
     renderFilters();
     renderTickerFeed();
     renderMasterTable();
     buildCharts();
-}
-
-function toggleSortOrder() {
-    currentSortOrder = currentSortOrder === 'desc' ? 'asc' : 'desc';
-    updateSortButtonUI();
-    renderTickerFeed();
-    renderMasterTable();
-}
-
-function updateSortButtonUI() {
-    const btn = document.getElementById('sort-toggle-btn');
-    const labels = translations[currentLang];
-    btn.innerText = currentSortOrder === 'desc' ? labels.sortNewest : labels.sortOldest;
 }
 
 function toggleLanguage() {
@@ -387,6 +362,7 @@ function renderFilters() {
     const existingSelections = new Set(activeFilters);
     container.innerHTML = '';
 
+    // Hardcoded robust schema ensuring UI consistency across engines
     const sources = [
         "General News", "Al Jazeera", "France24", "CNN Arabic", 
         "BBC Arabic", "X (Twitter)", "RT Arabic", "DW Arabic", 
@@ -418,14 +394,7 @@ function renderTickerFeed() {
     const container = document.getElementById('ticker-feed');
     container.innerHTML = '';
 
-    let filtered = cachedData.filter(item => !activeFilters.size || activeFilters.has(item.source));
-
-    // Dynamic Cron Sorting Matrix
-    filtered.sort((a, b) => {
-        const timeA = new Date(a.collected_at || 0);
-        const timeB = new Date(b.collected_at || 0);
-        return currentSortOrder === 'desc' ? timeB - timeA : timeA - timeB;
-    });
+    const filtered = cachedData.filter(item => !activeFilters.size || activeFilters.has(item.source));
 
     if (!filtered.length) {
         container.innerHTML = `<p class="text-xs text-slate-500 italic p-4 text-center">No active signals match filters.</p>`;
@@ -461,17 +430,10 @@ function renderMasterTable() {
     tbody.innerHTML = '';
 
     const searchQuery = document.getElementById('table-search').value.toLowerCase();
-    let filtered = cachedData.filter(item => {
+    const filtered = cachedData.filter(item => {
         const matchesFilter = !activeFilters.size || activeFilters.has(item.source);
         const matchesSearch = item.title.toLowerCase().includes(searchQuery) || item.source.toLowerCase().includes(searchQuery);
         return matchesFilter && matchesSearch;
-    });
-
-    // Dynamic Table Sorting Matrix
-    filtered.sort((a, b) => {
-        const timeA = new Date(a.collected_at || 0);
-        const timeB = new Date(b.collected_at || 0);
-        return currentSortOrder === 'desc' ? timeB - timeA : timeA - timeB;
     });
 
     filtered.forEach(item => {
@@ -508,6 +470,7 @@ function buildCharts() {
             labels: Object.keys(srcCounts),
             datasets: [{
                 data: Object.values(srcCounts),
+                // Expanded contextual palette matching UI badge colors seamlessly
                 backgroundColor: ['#059669', '#1877F2', '#26A5E4', '#EA4335', '#FF0000', '#a855f7', '#e11d48', '#d97706', '#2563eb', '#475569', '#000000', '#65a30d'],
                 borderWidth: 1,
                 borderColor: '#1e293b'
@@ -539,60 +502,4 @@ function buildCharts() {
             maintainAspectRatio: false,
             scales: {
                 x: { ticks: { color: '#94a3b8', font: { family: 'monospace', size: 10 } }, grid: { color: '#334155' } },
-                y: { ticks: { color: '#94a3b8', font: { family: 'monospace', size: 10 } }, grid: { color: '#334155' } }
-            },
-            plugins: { legend: { display: false } }
-        }
-    });
-}
-
-function exportToCSV() {
-    const headers = ["Title", "Source", "Geographic Vector", "Category", "Sentiment", "Velocity Score", "URL", "Collected At"];
-    let rows = cachedData.map(item => [
-        `"${item.title.replace(/"/g, '""')}"`,
-        `"${item.source}"`,
-        `"${item.geographic_vector || 'Global'}"`,
-        `"${item.category}"`,
-        `"${item.sentiment || 'Neutral'}"`,
-        item.velocity_score,
-        `"${item.url}"`,
-        `"${item.collected_at || ''}"`
-    ]);
-
-    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers.join(",")].concat(rows.map(e => e.join(","))).join("\n");
-    const link = document.createElement("a");
-    link.setAttribute("href", encodeURI(csvContent));
-    link.setAttribute("download", `Matrix_Export_${new Date().toISOString().split('T')[0]}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
-function connectWebSocket() {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
-    const statusText = document.getElementById('status-text');
-
-    ws.onopen = () => {
-        statusText.innerText = translations[currentLang].active;
-        pullMatrixData();
-    };
-    ws.onmessage = (e) => {
-        if (JSON.parse(e.data).type === "refresh_data") pullMatrixData();
-    };
-    ws.onclose = () => {
-        statusText.innerText = translations[currentLang].disconnected;
-        setTimeout(connectWebSocket, 5000);
-    };
-}
-
-applyLocalization();
-connectWebSocket();
-setInterval(pullMatrixData, 60000);
-
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js');
-}
-</script>
-</body>
-</html>
+                y: { ticks: { color: '#94a3b8', font: { family: 'monospace', size:
